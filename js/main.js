@@ -1,68 +1,99 @@
-// main.js - Central game loop and input handling
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-
-// Standard game resolution 
 canvas.width = 480;
 canvas.height = 720;
 
-// Initialize the grid once when the game loads
-initGrid();
+// UI Elements
+const homeScreen = document.getElementById('home-screen');
+const playBtn = document.getElementById('play-btn');
+const coinDisplay = document.getElementById('coin-display');
 
-// --- INPUT HANDLING ---
+// Game State & Economy
+let gameState = 'menu'; 
+let totalCoins = 0;
 
-// Listen for mouse clicks to shoot
+// Audio setup (Requires actual files in your assets folder to work)
+const popSound = new Audio('assets/audio/pop.mp3');
+const shootSound = new Audio('assets/audio/shoot.mp3');
+const winSound = new Audio('assets/audio/win.mp3');
+
+function playSound(audioEl) {
+    audioEl.currentTime = 0; 
+    audioEl.play().catch(e => console.log("Audio play prevented until interaction"));
+}
+
+function updateCoins(amount) {
+    totalCoins += amount;
+    coinDisplay.innerText = totalCoins;
+}
+
+playBtn.addEventListener('click', () => {
+    homeScreen.style.display = 'none'; 
+    initGrid(); 
+    resetLauncher(); 
+    gameState = 'playing';
+});
+
+function triggerWin() {
+    gameState = 'gameover';
+    playSound(winSound);
+    
+    let reward = 4;
+    
+    if (Math.random() < 0.30) {
+        reward += 12;
+        alert(`Level Cleared! You won ${reward} coins (Includes +12 Bonus!)`);
+    } else {
+        alert(`Level Cleared! You won ${reward} coins.`);
+    }
+
+    updateCoins(reward);
+    homeScreen.style.display = 'flex'; 
+}
+
+// Input Handling
 canvas.addEventListener('mousedown', (e) => {
-    // Get accurate mouse coordinates relative to the canvas
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    
     aimAndShoot(mouseX, mouseY);
 });
 
-// Support touch screens for mobile deployment
 canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // Prevent accidental scrolling while tapping
+    e.preventDefault(); 
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
     const touchX = touch.clientX - rect.left;
     const touchY = touch.clientY - rect.top;
-    
     aimAndShoot(touchX, touchY);
 }, { passive: false });
 
 
-// --- GAME ENGINE ---
-
+// Core Engine Loop
 function update() {
-    // Move the bubble and check for wall boundaries (logic from physics.js)
     updatePhysics(); 
 }
 
 function draw() {
-    // Clear the canvas for the new frame
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Draw background
     ctx.fillStyle = "#1a1a2e";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw the static grid of bubbles (logic from grid.js)
-    drawGrid(ctx);
-    
-    // Draw our moving (or waiting) launcher bubble (logic from physics.js)
-    drawLauncher(ctx); 
+    if (gameState === 'playing') {
+        drawGrid(ctx);
+        drawLauncher(ctx); 
+    }
 }
 
 function gameLoop() {
-    update();
-    draw();
-    
-    // Request the next frame to create a smooth animation loop
+    if (gameState === 'playing') {
+        update();
+    }
+    draw(); 
     requestAnimationFrame(gameLoop);
 }
 
-// Start the engine!
+// Initialize and wait for player
+initGrid();
 gameLoop();
