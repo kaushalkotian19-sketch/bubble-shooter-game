@@ -4,27 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bubble Shooter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
         <div id="top-ui" style="display: none;">
             <div class="ui-box">Moves: <span id="moves-display">20</span></div>
+            
+            <div id="progress-container">
+                <div id="progress-fill"></div>
+                <span class="star-marker" id="star-1" style="left: 30%;">☆</span>
+                <span class="star-marker" id="star-2" style="left: 60%;">☆</span>
+                <span class="star-marker" id="star-3" style="left: 90%;">☆</span>
+            </div>
+
             <div class="ui-box">Coins: <span id="coin-display-game">0</span></div>
         </div>
 
         <div id="home-screen">
-            <h1>Bubble Shooter</h1>
-            <p>Coins: <span id="coin-display">0</span></p>
-            <button id="play-btn">Tap to Start</button>
+            <div class="floating-bubbles">
+                <span style="left: 10%; width: 40px; height: 40px; animation-duration: 4s;"></span>
+                <span style="left: 30%; width: 20px; height: 20px; animation-duration: 6s; animation-delay: 1s;"></span>
+                <span style="left: 60%; width: 50px; height: 50px; animation-duration: 5s; animation-delay: 2s;"></span>
+                <span style="left: 80%; width: 30px; height: 30px; animation-duration: 7s;"></span>
+            </div>
+
+            <h1 class="game-title">Bubble Shooter</h1>
+            
+            <div id="loading-indicator">Loading Assets...</div>
+            
+            <div id="menu-content" style="display: none; z-index: 2;">
+                <p style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">Coins: <span id="coin-display" style="color: #ffcc00;">0</span></p>
+                <button id="play-btn">Tap to Start</button>
+            </div>
+        </div>
+        
+        <div id="store-screen" style="display: none;">
+            <div class="store-content">
+                <button id="close-store">✖</button>
+                <h2>Power-up Store</h2>
+                
+                <div class="store-item">
+                    <div class="item-info">
+                        <span class="item-icon">💣</span>
+                        <span class="item-name">Bomb x3</span>
+                    </div>
+                    <button class="buy-btn" onclick="buyItem('bomb', 29, 3)">
+                        29 <span class="coin-icon">🟡</span>
+                    </button>
+                </div>
+
+                <div class="store-item">
+                    <div class="item-info">
+                        <span class="item-icon">🔥</span>
+                        <span class="item-name">Fireball x3</span>
+                    </div>
+                    <button class="buy-btn" onclick="buyItem('fireball', 35, 3)">
+                        35 <span class="coin-icon">🟡</span>
+                    </button>
+                </div>
+                
+                <p class="store-footer">Current Coins: <span id="store-coin-display">0</span></p>
+            </div>
+        </div>
+
+        <div id="result-screen" style="display: none;">
+            <div class="store-content"> 
+                <h2 id="result-title">Level Cleared!</h2>
+                <p id="result-message" style="margin-bottom: 20px;">You won 4 coins.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+                    <button id="result-btn" class="buy-btn" style="padding: 15px 30px;">Next Level</button>
+                    <button id="result-menu-btn" class="buy-btn" style="background: #ff4d4d; color: white;">Main Menu</button>
+                </div>
+            </div>
         </div>
         
         <div id="bottom-ui" style="display: none;">
             <button id="btn-bomb" class="powerup-btn">
-                💣 <span class="badge" id="badge-bomb">2</span>
+                💣 <span class="badge" id="badge-bomb">0</span>
             </button>
             <button id="btn-fireball" class="powerup-btn">
-                🔥 <span class="badge" id="badge-fireball">1</span>
+                🔥 <span class="badge" id="badge-fireball">0</span>
             </button>
         </div>
         
