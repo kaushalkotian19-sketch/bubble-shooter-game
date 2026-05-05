@@ -8,15 +8,30 @@
 </head>
 <body>
     <div id="game-container">
+        <div id="top-ui" style="display: none;">
+            <div class="ui-box">Moves: <span id="moves-display">20</span></div>
+            <div class="ui-box">Coins: <span id="coin-display-game">0</span></div>
+        </div>
+
         <div id="home-screen">
             <h1>Bubble Shooter</h1>
             <p>Coins: <span id="coin-display">0</span></p>
             <button id="play-btn">Tap to Start</button>
         </div>
         
+        <div id="bottom-ui" style="display: none;">
+            <button id="btn-bomb" class="powerup-btn">
+                💣 <span class="badge" id="badge-bomb">2</span>
+            </button>
+            <button id="btn-fireball" class="powerup-btn">
+                🔥 <span class="badge" id="badge-fireball">1</span>
+            </button>
+        </div>
+        
         <canvas id="gameCanvas"></canvas>
     </div>
 
+    <script src="js/particles.js"></script>
     <script src="js/grid.js"></script>
     <script src="js/physics.js"></script>
     <script src="js/main.js"></script>
