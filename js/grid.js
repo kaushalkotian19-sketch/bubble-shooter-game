@@ -3,14 +3,36 @@ const ROWS = 10;
 const COLS = 11; 
 const COLORS = ['#ff4d4d', '#4dff4d', '#4d4dff', '#ffff4d', '#ff4dff'];
 
+const LEVELS = [
+    {
+        moves: 20,
+        layout: [
+            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2], 
+            [0, 1, 2, 3, 4, 1, 2, 3, 4, 1],    
+            [0, 0, 1, 1, 9, 9, 2, 2, 0, 0, 0], 
+            [0, 0, 0, 1, 1, 2, 2, 0, 0, 0],    
+            [0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0]  
+        ]
+    }
+];
+
+let currentLevelIndex = 0;
 let gameGrid = [];
 
 function initGrid() {
+    let levelData = LEVELS[currentLevelIndex];
+    
     for (let r = 0; r < ROWS; r++) {
         gameGrid[r] = [];
         for (let c = 0; c < COLS; c++) {
-            if (r < 5) {
-                gameGrid[r][c] = COLORS[Math.floor(Math.random() * COLORS.length)];
+            if (levelData.layout[r] && levelData.layout[r][c]) {
+                let cellValue = levelData.layout[r][c];
+                
+                if (cellValue >= 1 && cellValue <= 5) {
+                    gameGrid[r][c] = COLORS[cellValue - 1]; 
+                } else if (cellValue === 9) {
+                    gameGrid[r][c] = '#111'; 
+                }
             } else {
                 gameGrid[r][c] = null; 
             }
@@ -115,6 +137,8 @@ function removeOrphans() {
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             if (gameGrid[r][c] && !safeBubbles.has(`${r},${c}`)) {
+                let { x, y } = getBubbleCoords(r, c);
+                createExplosion(x, y, gameGrid[r][c]); // Explode orphans too!
                 gameGrid[r][c] = null; 
                 orphansFound++;
             }
@@ -130,11 +154,12 @@ function checkGameOver() {
             alert("Game Over! The bubbles reached the bottom.");
             gameState = 'gameover';
             document.getElementById('home-screen').style.display = 'flex';
+            document.getElementById('top-ui').style.display = 'none';
+            document.getElementById('bottom-ui').style.display = 'none';
             return true;
         }
     }
     
-    // Check if the board is completely clear for a win
     let isBoardClear = true;
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -147,6 +172,18 @@ function checkGameOver() {
     
     if (isBoardClear) {
         triggerWin();
+        return true;
+    }
+
+    if (!isBoardClear && !currentBubble.isMoving && movesRemaining <= 0) {
+        setTimeout(() => { 
+            alert("Out of moves! Game Over.");
+            gameState = 'gameover';
+            document.getElementById('home-screen').style.display = 'flex';
+            document.getElementById('top-ui').style.display = 'none';
+            document.getElementById('bottom-ui').style.display = 'none';
+        }, 500);
+        return true;
     }
     
     return false;
@@ -162,13 +199,16 @@ function snapBubble(x, y, color) {
 
     if (row < ROWS && col < COLS) {
         
-        // Bomb Logic
         if (currentBubble.type === 'bomb') {
             let blastRadius = getNeighbors(row, col);
             blastRadius.push({ r: row, c: col }); 
             
             blastRadius.forEach(n => {
-                gameGrid[n.r][n.c] = null;
+                if (gameGrid[n.r][n.c]) {
+                    let { x: bx, y: by } = getBubbleCoords(n.r, n.c);
+                    createExplosion(bx, by, gameGrid[n.r][n.c]);
+                    gameGrid[n.r][n.c] = null;
+                }
             });
             
             removeOrphans();
@@ -176,12 +216,13 @@ function snapBubble(x, y, color) {
             return; 
         }
 
-        // Normal Match Logic
         gameGrid[row][col] = color;
         let matches = findMatches(row, col, color);
         
         if (matches.length >= 3) {
             matches.forEach(m => {
+                let { x: mx, y: my } = getBubbleCoords(m.r, m.c);
+                createExplosion(mx, my, color);
                 gameGrid[m.r][m.c] = null; 
             });
             removeOrphans(); 
