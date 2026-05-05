@@ -11,7 +11,7 @@ body {
 }
 
 #game-container {
-    position: relative; /* Important for absolute positioning of home screen */
+    position: relative; 
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
     background-color: #000;
 }
@@ -52,4 +52,58 @@ canvas {
 
 #play-btn:active {
     transform: scale(0.95);
+}
+
+#top-ui {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    z-index: 5;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+}
+
+#bottom-ui {
+    position: absolute;
+    bottom: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 5;
+}
+
+.powerup-btn {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    background: linear-gradient(180deg, #4a4a8a, #2a2a5a);
+    border: 2px solid #6a6aaa;
+    border-radius: 15px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    transition: transform 0.1s;
+}
+
+.powerup-btn:active {
+    transform: scale(0.9);
+}
+
+.badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background-color: #ff007f;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 3px 6px;
+    border-radius: 10px;
+    border: 2px solid white;
 }
