@@ -1,6 +1,7 @@
 const LAUNCHER_X = 240; 
-const LAUNCHER_Y = 680; 
+const LAUNCHER_Y = 580; 
 const BUBBLE_SPEED = 12;
+// TOP_MARGIN is inherited from grid.js
 
 let currentBubble = {
     x: LAUNCHER_X,
@@ -20,6 +21,7 @@ let nextBubble = {
 function aimAndShoot(targetX, targetY) {
     if (currentBubble.isMoving || gameState !== 'playing' || movesRemaining <= 0) return; 
 
+    playSound(shootSound);
     movesRemaining--;
     document.getElementById('moves-display').innerText = movesRemaining;
 
@@ -43,7 +45,7 @@ function updatePhysics() {
     }
 
     if (currentBubble.type === 'fireball') {
-        if (currentBubble.y - BUBBLE_RADIUS <= 0) {
+        if (currentBubble.y - BUBBLE_RADIUS <= TOP_MARGIN) {
             currentBubble.isMoving = false;
             removeOrphans(); 
             checkGameOver();
@@ -62,6 +64,7 @@ function updatePhysics() {
                     if (distance <= BUBBLE_RADIUS * 2) {
                         createExplosion(bubblePos.x, bubblePos.y, gameGrid[r][c]);
                         gameGrid[r][c] = null; 
+                        addScore(1);
                     }
                 }
             }
@@ -70,7 +73,7 @@ function updatePhysics() {
     }
 
     let collided = false;
-    if (currentBubble.y - BUBBLE_RADIUS <= 0) collided = true;
+    if (currentBubble.y - BUBBLE_RADIUS <= TOP_MARGIN) collided = true;
 
     if (!collided) {
         for (let r = 0; r < ROWS; r++) {
@@ -93,6 +96,7 @@ function updatePhysics() {
 
     if (collided) {
         currentBubble.isMoving = false;
+        playSound(popSound);
         snapBubble(currentBubble.x, currentBubble.y, currentBubble.color);
         resetLauncher();
     }
@@ -154,7 +158,7 @@ function drawTrajectory(ctx, targetX, targetY) {
             simDx *= -1; 
         }
 
-        if (simY - BUBBLE_RADIUS <= 0) break;
+        if (simY - BUBBLE_RADIUS <= TOP_MARGIN) break;
 
         ctx.beginPath();
         ctx.arc(simX, simY, 4, 0, Math.PI * 2);
